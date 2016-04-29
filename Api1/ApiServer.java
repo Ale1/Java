@@ -1,6 +1,4 @@
-// https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/networking/sockets/examples/EchoServer.java
 
-import java.net.*;
 import java.io.*;
 import java.util.Scanner;
 
@@ -11,7 +9,6 @@ import org.json.simple.parser.JSONParser;
  
 
 public class ApiServer {
-
 
 
     public static String get_url(String text){
@@ -25,15 +22,12 @@ public class ApiServer {
         JSONArray obj3 = (JSONArray)obj2.get("results");
         JSONObject obj4 = (JSONObject)obj3.get(0);
         result = obj4.get("permalink").toString();
-
       
       }catch(ParseException pe){
-        
-         System.out.println("crapsie");
+         System.out.println("Parse error");
       }
       return result;
    }
-
 
 
     public static String fetch(String arg) {
@@ -50,30 +44,23 @@ public class ApiServer {
 
                 InputStream response = connection.getInputStream();
 
-
                 try (Scanner scanner = new Scanner(response)) {
                     String responseBody = scanner.useDelimiter("\\A").next();
 
                     return_string = get_url(responseBody);
-            
                 }
 
         } 
         catch (MalformedURLException e) { 
                 // new URL() failed
-                // ...
                 System.out.println("woopsie");
         } 
         catch (IOException e) {   
                 // openConnection() failed
-                // ...
                 System.out.println("Woopsie doopsie");
         }
         return return_string;
     }
-
-
-
 
 
 
