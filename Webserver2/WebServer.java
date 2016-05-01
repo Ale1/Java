@@ -15,7 +15,7 @@ class WebServer{
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
-        int port_num = 5541;
+        int port_num = 8080;
 
         try {
             serverSocket = new ServerSocket(port_num); // create listening Server socket
