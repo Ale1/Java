@@ -25,29 +25,26 @@ class WebServer{
                 
                 Socket clientSocket = serverSocket.accept(); // Always accept new clients
                 OutputStream outputStream = clientSocket.getOutputStream();
-                outputStream.write (("<html><body><p> YOUR MLA ITEMS</p>").getBytes());
+                outputStream.write (("<html><body><p> YOUR ITEMS</p>").getBytes());
 
 
-                //generate 10 requests with different offsets
-                int[] offsets = {1,2,3,4,5,6,7,8,9,10};
-                List<RequestHandler> threads = new ArrayList<RequestHandler>();
-
-             
-                for(int x : offsets){
-                    RequestHandler thread  = new RequestHandler(clientSocket, x);  // Make new thread for each request 
-                    thread.start();//and call it's run procedure
-                    threads.add( thread); // add to threads array, used later for join operation;
-                } 
+                // list of meli country codes
+                String[] countries = {"MLB", "MLA", "MCO","MLM"};
+                List<CountryHandler> country_threads = new ArrayList<CountryHandler>();
+                for(String country : countries){
+                    CountryHandler country_thread  = new CountryHandler(clientSocket, country);  // Make new thread for each request 
+                    country_thread.start();//and call it's run procedure
+                    country_threads.add( country_thread); // add to threads array, used later for join operation;
+        } 
 
 
-                // "join" makes it wait for all threads to complete.
-                for (RequestHandler thread : threads) {
-                  try{thread.join();} catch(Exception e) { System.out.println("join error");}
-                  
-                }
+        // "join" makes it wait for all threads to complete.
+            for (CountryHandler country_thread : country_threads) {
+                  try{country_thread.join();} catch(Exception e) { System.out.println("join error");}      
+            }
 
                 outputStream.write(
-                            ("</td></table><p> FINISHED MLA</p></body></html>").getBytes()
+                            ("</td></table><p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes()
                 );         
             } 
 
@@ -57,18 +54,61 @@ class WebServer{
     }
 }
 
-   
+
+
+
+class CountryHandler extends Thread {
+    Socket clientSocket;
+    String country;
+    OutputStream outputStream;
+
+    CountryHandler(Socket clientSocket, String country) {
+        this.clientSocket = clientSocket;
+        this.country = country;
+        try{ this.outputStream = clientSocket.getOutputStream();}catch(Exception e){ System.out.println("woopsie");}
+    }
+
+    public void run() {
+
+        //generate 10 requests with different offsets
+        int[] offsets = {1,2,3,4,5,6,7,8,9,10};
+        List<RequestHandler> threads = new ArrayList<RequestHandler>();
+
+             
+        for(int x : offsets){
+            RequestHandler thread  = new RequestHandler(clientSocket, country, x);  // Make new thread for each request 
+            thread.start();//and call it's run procedure
+            threads.add( thread); // add to threads array, used later for join operation;
+        } 
+
+
+        //  makes it wait for all offset threads to complete.
+            for (RequestHandler thread : threads) {
+                  try{thread.join();} catch(Exception e) { System.out.println("join error");}      
+            }
+
+            try{ this.outputStream = clientSocket.getOutputStream();
+                    outputStream.write(
+                        ("</td></table><p> finished all  " + country +" requests </p></body></html>").getBytes()
+                    ); 
+                }catch(Exception e) {System.out.println("woops");}         
+
+    }
+}
+
+
 
 
 class RequestHandler extends Thread {
     
     Socket clientSocket;
     int offset;
+    String country;
 
-    RequestHandler(Socket clientSocket,  int offset) {
+    RequestHandler(Socket clientSocket,  String country, int offset) {
         this.clientSocket = clientSocket;
         this.offset = offset;
-
+        this.country = country;
                     
     }
 
@@ -109,7 +149,7 @@ class RequestHandler extends Thread {
         System.out.println("new thread processing request on server (item: " + offset + ")");
 
         try {
-                URL myURL = new URL("https://api.mercadolibre.com/sites/MLA/search?category=MLA1648&limit=1&offset="+offset+"&attributes=results");
+                URL myURL = new URL("https://api.mercadolibre.com/sites/"+country+ "/search?category="+country+"1648&limit=1&offset="+offset+"&attributes=results");
                 HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
                 connection.setRequestMethod("GET");
 
@@ -124,11 +164,11 @@ class RequestHandler extends Thread {
 
            
                 try { 
-                    outputStream.write(("<p><a href=" + response_url +">item "+ offset + "</a></p>").getBytes());           
-                    System.out.println("Done processing request (item "+ offset +")");
+                    outputStream.write(("<p><a href=" + response_url +">item "+ country + offset + "</a></p>").getBytes());           
+                    System.out.println("Done processing request (item "+ country + offset +")");
     
                 }catch(Exception e) {
-                    System.out.println("error processing request for item " + offset );
+                    System.out.println("error processing request for item " + country + offset );
                 }
 
         } 
