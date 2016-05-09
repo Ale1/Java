@@ -21,43 +21,61 @@ class WebServer{
             serverSocket = new ServerSocket(port_num); // create listening Server socket
             System.out.println("Server started. Listening to the port: " + port_num);
 
+
             while (true) {  // always on listening for TCP connection requests
-                
-                Socket clientSocket = serverSocket.accept(); // Always accept new clients
-                OutputStream outputStream = clientSocket.getOutputStream();
-                outputStream.write (("<html><body><p> YOUR MLA ITEMS</p>").getBytes());
-
-
-                //generate 10 requests with different offsets
-                int[] offsets = {1,2,3,4,5,6,7,8,9,10};
-                List<RequestHandler> threads = new ArrayList<RequestHandler>();
-
-             
-                for(int x : offsets){
-                    RequestHandler thread  = new RequestHandler(clientSocket, x);  // Make new thread for each request 
-                    thread.start();//and call it's run procedure
-                    threads.add( thread); // add to threads array, used later for join operation;
-                } 
-
-
-                // "join" makes it wait for all threads to complete.
-                for (RequestHandler thread : threads) {
-                  try{thread.join();} catch(Exception e) { System.out.println("join error");}
-                  
-                }
-
-                outputStream.write(
-                            ("</td></table><p> FINISHED MLA</p></body></html>").getBytes()
-                );         
-            } 
+                ConnectionHandler thread = new ConnectionHandler(serverSocket.accept()); // start thread to handle client
+                System.out.println("accepted connection");
+                thread.start();
+            }          
 
         } catch (IOException e) {
-            System.out.println("Could not listen on port: " + port_num);
+            System.out.println("Could not listen on port: " + port_num + "because" + e);
         }      
     }
 }
 
-   
+
+class ConnectionHandler extends Thread {
+    Socket clientSocket;
+
+    ConnectionHandler(Socket clientSocket) {
+        this.clientSocket = clientSocket;
+    }
+
+
+    public void run() {
+        try{
+            System.out.println("processing client connection requests...");
+            OutputStream outputStream = clientSocket.getOutputStream();
+            outputStream.write (("<html><body><p> YOUR MLA ITEMS</p>").getBytes());
+
+            //generate 10 requests with different offsets 
+            int[] offsets = {1,2,3,4,5,6,7,8,9,10};
+            List<RequestHandler> threads = new ArrayList<RequestHandler>();
+
+            for(int x : offsets){
+                RequestHandler thread  = new RequestHandler(clientSocket, x);  // Make new thread for each item request 
+                thread.start();//and call it's run procedure
+                threads.add(thread); // add to threads array, used later for join operation;
+            } 
+             // "join" makes it wait for all threads to complete.
+            for (RequestHandler thread : threads) {
+                try{
+                    thread.join();
+                } 
+                catch(Exception e) { 
+                    System.out.println("join error");
+                }  
+            }
+             outputStream.write(("</td></table><p> FINISHED MLA</p></body></html>").getBytes());         
+
+
+        }
+        catch(Exception e) {
+            System.out.println("error with connection handler");
+        }
+    }  
+} 
 
 
 class RequestHandler extends Thread {
@@ -68,7 +86,6 @@ class RequestHandler extends Thread {
     RequestHandler(Socket clientSocket,  int offset) {
         this.clientSocket = clientSocket;
         this.offset = offset;
-
                     
     }
 
