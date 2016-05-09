@@ -15,45 +15,57 @@ class WebServer{
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
-        int port_num = 8080;
+        int port_num = 8000;
 
         try {
             serverSocket = new ServerSocket(port_num); // create listening Server socket
             System.out.println("Server started. Listening to the port: " + port_num);
 
-            while (true) {  // always on listening for TCP connection requests
-                
-                Socket clientSocket = serverSocket.accept(); // Always accept new clients
-                OutputStream outputStream = clientSocket.getOutputStream();
-                outputStream.write (("<html><body><p> YOUR ITEMS</p>").getBytes());
-
-
-                // list of meli country codes
-                String[] countries = {"MLB", "MLA", "MCO","MLM"};
-                List<CountryHandler> country_threads = new ArrayList<CountryHandler>();
-                for(String country : countries){
-                    CountryHandler country_thread  = new CountryHandler(clientSocket, country);  // Make new thread for each request 
-                    country_thread.start();//and call it's run procedure
-                    country_threads.add( country_thread); // add to threads array, used later for join operation;
-        } 
-
-
-        // "join" makes it wait for all threads to complete.
-            for (CountryHandler country_thread : country_threads) {
-                  try{country_thread.join();} catch(Exception e) { System.out.println("join error");}      
+            while (true) {  // always on listening for TCP connection requests       
+                ConnectionHandler thread = new ConnectionHandler(serverSocket.accept());
+                thread.start();
             }
-
-                outputStream.write(
-                            ("</td></table><p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes()
-                );         
-            } 
+                
 
         } catch (IOException e) {
-            System.out.println("Could not listen on port: " + port_num);
+            System.out.println("Could not listen on port: " + port_num + " because " + e);
         }      
     }
 }
 
+class ConnectionHandler  extends Thread {
+    Socket clientSocket;
+
+    ConnectionHandler(Socket clientSocket){
+        this.clientSocket = clientSocket;
+    }
+
+    public void run(){
+        try{
+            OutputStream outputStream = clientSocket.getOutputStream();
+            outputStream.write (("<html><body><p> YOUR ITEMS</p>").getBytes());
+
+            // list of meli country codes
+            String[] countries = {"MLB", "MLA", "MCO","MLM"};
+            List<CountryHandler> country_threads = new ArrayList<CountryHandler>();
+            for(String country : countries){
+                CountryHandler country_thread  = new CountryHandler(clientSocket, country);  // Make new thread for each request 
+                country_thread.start();//and call it's run procedure
+                country_threads.add( country_thread); // add to threads array, used later for join operation;
+            } 
+
+            // "join" makes it wait for all threads to complete.
+            for (CountryHandler country_thread : country_threads) {
+                try{country_thread.join();} catch(Exception e) { System.out.println("join error");}      
+            }
+
+            outputStream.write(("</td></table><p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes());  
+        }catch (Exception e){
+            System.out.println("connection handler error");
+
+        }       
+    } 
+}
 
 
 
