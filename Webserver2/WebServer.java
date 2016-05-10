@@ -15,7 +15,7 @@ class WebServer{
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
-        int port_num = 8000;
+        int port_num = 8080;
 
         try {
             serverSocket = new ServerSocket(port_num); // create listening Server socket
@@ -34,7 +34,7 @@ class WebServer{
 }
 
 class ConnectionHandler  extends Thread {
-    Socket clientSocket;
+    private Socket clientSocket;
 
     ConnectionHandler(Socket clientSocket){
         this.clientSocket = clientSocket;
@@ -46,7 +46,7 @@ class ConnectionHandler  extends Thread {
             outputStream.write (("<html><body><p> YOUR ITEMS</p>").getBytes());
 
             // list of meli country codes
-            String[] countries = {"MLB", "MLA", "MCO","MLM"};
+            String[] countries = {"MLB", "MLA", "MCO"};
             List<CountryHandler> country_threads = new ArrayList<CountryHandler>();
             for(String country : countries){
                 CountryHandler country_thread  = new CountryHandler(clientSocket, country);  // Make new thread for each request 
@@ -59,7 +59,10 @@ class ConnectionHandler  extends Thread {
                 try{country_thread.join();} catch(Exception e) { System.out.println("join error");}      
             }
 
-            outputStream.write(("</td></table><p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes());  
+            outputStream.write(("<p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes());
+            outputStream.close();
+ 
+
         }catch (Exception e){
             System.out.println("connection handler error");
 
@@ -70,9 +73,9 @@ class ConnectionHandler  extends Thread {
 
 
 class CountryHandler extends Thread {
-    Socket clientSocket;
-    String country;
-    OutputStream outputStream;
+    private Socket clientSocket;
+    private String country;
+    private OutputStream outputStream;
 
     CountryHandler(Socket clientSocket, String country) {
         this.clientSocket = clientSocket;
@@ -101,7 +104,7 @@ class CountryHandler extends Thread {
 
             try{ this.outputStream = clientSocket.getOutputStream();
                     outputStream.write(
-                        ("</td></table><p> finished all  " + country +" requests </p></body></html>").getBytes()
+                        ("<p> finished all  " + country +" requests </p></body></html>").getBytes()
                     ); 
                 }catch(Exception e) {System.out.println("woops");}         
 
@@ -112,16 +115,27 @@ class CountryHandler extends Thread {
 
 
 class RequestHandler extends Thread {
-    
-    Socket clientSocket;
-    int offset;
-    String country;
+    private Socket clientSocket;
+    private int offset;
+    private String country;
 
     RequestHandler(Socket clientSocket,  String country, int offset) {
         this.clientSocket = clientSocket;
         this.offset = offset;
-        this.country = country;
-                    
+        this.country = country;                 
+    }
+
+    public void htmlWriter(String response_url) {
+
+        try { 
+            OutputStream outputStream = clientSocket.getOutputStream();
+            outputStream.write(("<p><a href=" + response_url +">item "+ country + offset + "</a></p>").getBytes());           
+            System.out.println("Done processing request (item "+ country + offset +")");
+    
+        }
+        catch(Exception e) {
+            System.out.println("error processing request for item " + country + offset + " : " + e );
+        }
     }
 
 
@@ -158,8 +172,6 @@ class RequestHandler extends Thread {
 
     public void run() {
 
-        System.out.println("new thread processing request on server (item: " + offset + ")");
-
         try {
                 URL myURL = new URL("https://api.mercadolibre.com/sites/"+country+ "/search?category="+country+"1648&limit=1&offset="+offset+"&attributes=results");
                 HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
@@ -169,26 +181,20 @@ class RequestHandler extends Thread {
                 connection.setRequestProperty("Accept", "application/json");
 
                 InputStream inputStream = connection.getInputStream();
-                OutputStream outputStream = clientSocket.getOutputStream();
 
                 String responseBody = parseInputStream(inputStream); // inputstream to text
                 String response_url = jsonParser(responseBody);  // text to json, then fetch url
 
+                htmlWriter(response_url); // write result to output stream
+
            
-                try { 
-                    outputStream.write(("<p><a href=" + response_url +">item "+ country + offset + "</a></p>").getBytes());           
-                    System.out.println("Done processing request (item "+ country + offset +")");
-    
-                }catch(Exception e) {
-                    System.out.println("error processing request for item " + country + offset );
-                }
 
         } 
         catch (MalformedURLException e) { 
                 System.out.println("new URL() failed");
         } 
         catch (IOException e) {   
-                System.out.println("openConnection() failed");
+                System.out.println("GET request failed: " + e);
         }
     }
 

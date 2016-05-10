@@ -67,7 +67,9 @@ class ConnectionHandler extends Thread {
                     System.out.println("join error");
                 }  
             }
-             outputStream.write(("</td></table><p> FINISHED MLA</p></body></html>").getBytes());         
+            
+            outputStream.write(("</td></table><p> FINISHED MLA</p></body></html>").getBytes());
+            outputStream.close();
 
 
         }
@@ -87,6 +89,20 @@ class RequestHandler extends Thread {
         this.clientSocket = clientSocket;
         this.offset = offset;
                     
+    }
+
+
+    public void htmlWriter(String response_url) {
+
+        try { 
+            OutputStream outputStream = clientSocket.getOutputStream();
+            outputStream.write(("<p><a href=" + response_url +">item "+ offset + "</a></p>").getBytes());           
+            System.out.println("Done processing request (item "+ offset +")");
+    
+        }
+        catch(Exception e) {
+            System.out.println("error processing request for item " + offset + " : " + e );
+        }
     }
 
 
@@ -134,19 +150,12 @@ class RequestHandler extends Thread {
                 connection.setRequestProperty("Accept", "application/json");
 
                 InputStream inputStream = connection.getInputStream();
-                OutputStream outputStream = clientSocket.getOutputStream();
 
                 String responseBody = parseInputStream(inputStream); // inputstream to text
                 String response_url = jsonParser(responseBody);  // text to json, then fetch url
 
-           
-                try { 
-                    outputStream.write(("<p><a href=" + response_url +">item "+ offset + "</a></p>").getBytes());           
-                    System.out.println("Done processing request (item "+ offset +")");
-    
-                }catch(Exception e) {
-                    System.out.println("error processing request for item " + offset );
-                }
+                htmlWriter(response_url); // write response to outputStream
+
 
         } 
         catch (MalformedURLException e) { 
