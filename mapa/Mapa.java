@@ -7,10 +7,10 @@ import java.util.Arrays;
 
 class Mapa {
 
-	static ArrayList<String[]> contents = new ArrayList<String[]>();  
+	ArrayList<String[]> contents = new ArrayList<String[]>();  
 		
 	//adds new key-value, or edits existing one if already present
-	public static void put(String key , String value) {
+	public void put(String key , String value) {
 
 		for(int i = 0; i < contents.size()+1; i++) {
 		 	//cycle through all keys. if key not found, add new key-value.
@@ -29,7 +29,7 @@ class Mapa {
 	}
 
 	// fetches value for specified parameter key
-	public static String get(String key) {
+	public String get(String key) {
 		for(int i = 0; i < contents.size(); i++) {
 			String[] arr = contents.get(i);
 			if (arr[0] == key) {
@@ -67,8 +67,9 @@ class MapaTest  {
 		}
 		System.out.println("full hash: " + sb);
 
+		Mapa test2 = new Mapa();
+		System.out.println(test2.get("name"));
 	}
-
 }
 
 
