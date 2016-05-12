@@ -3,20 +3,19 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
-
 class Mapa {
 
 	ArrayList<Object[]> contents = new ArrayList<Object[]>();  
 		
 	//adds new key-value, or edits existing one if already present
-	public void put(Object key , Object value) {
+	public void put(String key , Object value) {
+
 
 		for(int i = 0; i < contents.size()+1; i++) {
 		 	//cycle through all keys. if key not found, add new key-value.
 			if (i == contents.size()) {
-				Object[] pair = new Object[] {key, value}; 
-				contents.add(pair);
+				Object[] entry = new Object[] {key, value}; 
+				contents.add(entry);
 				break;
 			}
 
@@ -28,12 +27,12 @@ class Mapa {
 		}
 	}
 
-	// fetches value for specified parameter key
+	// fetches value for specified parameter key.  includes dynamic casting to return object types. 
 	public Object get(Object key) {
 		for(int i = 0; i < contents.size(); i++) {
 			Object[] arr = contents.get(i);
 			if (arr[0] == key) {
-				return arr[1];
+				return (arr[1].getClass()).cast(arr[1]);
 			}	
 		}
 		//return null if key does not exist
@@ -54,7 +53,7 @@ class MapaTest  {
 		System.out.println("edad " + test.get("age"));
 		test.put("name","tomas");
 		System.out.println("nuevo nombre: " + test.get("name"));
-		System.out.println("key inexistente: " + test.get("age"));
+		System.out.println("key inexistente: " + test.get("nationality"));
 	
 
 		StringBuilder sb = new StringBuilder();
