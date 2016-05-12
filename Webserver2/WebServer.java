@@ -171,7 +171,7 @@ class RequestHandler extends Thread {
 
 
 
-class ServerUtils {
+abstract class ServerUtils {
     public static String jsonParser(String text){
     
         JSONParser parser = new JSONParser();
