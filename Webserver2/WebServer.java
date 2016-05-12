@@ -21,7 +21,8 @@ class WebServer{
             serverSocket = new ServerSocket(port_num); // create listening Server socket
             System.out.println("Server started. Listening to the port: " + port_num);
 
-            while (true) {  // always on listening for TCP connection requests       
+            while (true) {  // always on listening for TCP connection requests
+                // each accepted connection starts a new  ConnectionHandler thread:       
                 ConnectionHandler thread = new ConnectionHandler(serverSocket.accept());
                 thread.start();
             }
@@ -49,6 +50,7 @@ class ConnectionHandler  extends Thread {
             String[] countries = {"MLB", "MLA", "MCO"};
             List<CountryHandler> country_threads = new ArrayList<CountryHandler>();
             for(String country : countries){
+                // each ConnectionHandler creates individual CountryHandler threads for each country:
                 CountryHandler country_thread  = new CountryHandler(clientSocket, country);  // Make new thread for each request 
                 country_thread.start();//and call it's run procedure
                 country_threads.add( country_thread); // add to threads array, used later for join operation;
@@ -89,7 +91,7 @@ class CountryHandler extends Thread {
         int[] offsets = {1,2,3,4,5,6,7,8,9,10};
         List<RequestHandler> threads = new ArrayList<RequestHandler>();
 
-             
+        //each countryHandler thread creates a new thread for each of the 10 requests:   
         for(int x : offsets){
             RequestHandler thread  = new RequestHandler(clientSocket, country, x);  // Make new thread for each request 
             thread.start();//and call it's run procedure
@@ -106,11 +108,10 @@ class CountryHandler extends Thread {
                     outputStream.write(
                         ("<p> finished all  " + country +" requests </p></body></html>").getBytes()
                     ); 
-                }catch(Exception e) {System.out.println("woops");}         
+            }catch(Exception e) {System.out.println("woops");}         
 
     }
 }
-
 
 
 
@@ -125,7 +126,7 @@ class RequestHandler extends Thread {
         this.country = country;                 
     }
 
-    public void htmlWriter(String response_url) {
+    private void htmlWriter(String response_url) {
 
         try { 
             OutputStream outputStream = clientSocket.getOutputStream();
@@ -139,6 +140,38 @@ class RequestHandler extends Thread {
     }
 
 
+    public void run() {
+
+        try {
+                URL myURL = new URL("https://api.mercadolibre.com/sites/"+country+ "/search?category="+country+"1648&limit=1&offset="+offset+"&attributes=results");
+                HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
+                connection.setRequestMethod("GET");
+
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+
+                InputStream inputStream = connection.getInputStream();
+
+                String responseBody = ServerUtils.parseInputStream(inputStream); // inputstream to text
+                String response_url = ServerUtils.jsonParser(responseBody);  // text to json, then fetch url
+
+                htmlWriter(response_url); // write result to output stream
+
+           
+
+        } 
+        catch (MalformedURLException e) { 
+                System.out.println("new URL() failed");
+        } 
+        catch (IOException e) {   
+                System.out.println("GET request failed: " + e);
+        }
+    }
+}
+
+
+
+class ServerUtils {
     public static String jsonParser(String text){
     
         JSONParser parser = new JSONParser();
@@ -160,7 +193,7 @@ class RequestHandler extends Thread {
    }
 
 
-   public String parseInputStream(InputStream stream) {
+    public static String parseInputStream(InputStream stream) {
 
         String parsedStream;
         try (Scanner scanner = new Scanner(stream)) {
@@ -170,35 +203,9 @@ class RequestHandler extends Thread {
    }
 
 
-    public void run() {
-
-        try {
-                URL myURL = new URL("https://api.mercadolibre.com/sites/"+country+ "/search?category="+country+"1648&limit=1&offset="+offset+"&attributes=results");
-                HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
-                connection.setRequestMethod("GET");
-
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                InputStream inputStream = connection.getInputStream();
-
-                String responseBody = parseInputStream(inputStream); // inputstream to text
-                String response_url = jsonParser(responseBody);  // text to json, then fetch url
-
-                htmlWriter(response_url); // write result to output stream
-
-           
-
-        } 
-        catch (MalformedURLException e) { 
-                System.out.println("new URL() failed");
-        } 
-        catch (IOException e) {   
-                System.out.println("GET request failed: " + e);
-        }
-    }
-
 }
+
+
 
    
 
