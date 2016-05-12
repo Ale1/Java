@@ -15,7 +15,7 @@ class WebServer{
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
-        int port_num = 8080;
+        int port_num = 8070;
 
         try {
             serverSocket = new ServerSocket(port_num); // create listening Server socket
@@ -92,7 +92,7 @@ class RequestHandler extends Thread {
     }
 
 
-    public void htmlWriter(String response_url) {
+    private void htmlWriter(String response_url) {
 
         try { 
             OutputStream outputStream = clientSocket.getOutputStream();
@@ -104,6 +104,50 @@ class RequestHandler extends Thread {
             System.out.println("error processing request for item " + offset + " : " + e );
         }
     }
+
+
+    public void run() {
+
+        System.out.println("new thread processing request on server (item: " + offset + ")");
+
+        try {
+                URL myURL = new URL("https://api.mercadolibre.com/sites/MLA/search?category=MLA1648&limit=1&offset="+offset+"&attributes=results");
+                HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
+                connection.setRequestMethod("GET");
+
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+
+                InputStream inputStream = connection.getInputStream();
+
+                String responseBody = ServerUtils.parseInputStream(inputStream); // inputstream to text
+                String response_url = ServerUtils.jsonParser(responseBody);  // text to json, then fetch url
+
+                htmlWriter(response_url); // write response to outputStream
+
+
+        } 
+        catch (MalformedURLException e) { 
+                System.out.println("new URL() failed");
+        } 
+        catch (IOException e) {   
+                System.out.println("openConnection() failed");
+        }
+    }
+
+}
+
+
+class ServerUtils {
+    
+    public static String parseInputStream(InputStream stream) {
+
+        String parsedStream;
+        try (Scanner scanner = new Scanner(stream)) {
+                parsedStream = scanner.useDelimiter("\\A").next();
+        }
+        return parsedStream;
+   }
 
 
     public static String jsonParser(String text){
@@ -125,46 +169,6 @@ class RequestHandler extends Thread {
         }
         return result;
    }
-
-
-   public String parseInputStream(InputStream stream) {
-
-        String parsedStream;
-        try (Scanner scanner = new Scanner(stream)) {
-                parsedStream = scanner.useDelimiter("\\A").next();
-        }
-        return parsedStream;
-   }
-
-
-    public void run() {
-
-        System.out.println("new thread processing request on server (item: " + offset + ")");
-
-        try {
-                URL myURL = new URL("https://api.mercadolibre.com/sites/MLA/search?category=MLA1648&limit=1&offset="+offset+"&attributes=results");
-                HttpURLConnection connection = (HttpURLConnection)myURL.openConnection();
-                connection.setRequestMethod("GET");
-
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                InputStream inputStream = connection.getInputStream();
-
-                String responseBody = parseInputStream(inputStream); // inputstream to text
-                String response_url = jsonParser(responseBody);  // text to json, then fetch url
-
-                htmlWriter(response_url); // write response to outputStream
-
-
-        } 
-        catch (MalformedURLException e) { 
-                System.out.println("new URL() failed");
-        } 
-        catch (IOException e) {   
-                System.out.println("openConnection() failed");
-        }
-    }
 
 }
 
