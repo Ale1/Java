@@ -7,15 +7,15 @@ import java.util.Arrays;
 
 class Mapa {
 
-	ArrayList<String[]> contents = new ArrayList<String[]>();  
+	ArrayList<Object[]> contents = new ArrayList<Object[]>();  
 		
 	//adds new key-value, or edits existing one if already present
-	public void put(String key , String value) {
+	public void put(Object key , Object value) {
 
 		for(int i = 0; i < contents.size()+1; i++) {
 		 	//cycle through all keys. if key not found, add new key-value.
 			if (i == contents.size()) {
-				String[] pair = new String[] {key, value}; 
+				Object[] pair = new Object[] {key, value}; 
 				contents.add(pair);
 				break;
 			}
@@ -29,9 +29,9 @@ class Mapa {
 	}
 
 	// fetches value for specified parameter key
-	public String get(String key) {
+	public Object get(Object key) {
 		for(int i = 0; i < contents.size(); i++) {
-			String[] arr = contents.get(i);
+			Object[] arr = contents.get(i);
 			if (arr[0] == key) {
 				return arr[1];
 			}	
@@ -49,26 +49,26 @@ class MapaTest  {
 		System.out.println("empty:" + test.contents);
 		test.put ("name","juan");
 		test.put("surname", "perez");
+		test.put("age",25);
 		System.out.println("nombre: " + test.get("name"));
-		System.out.println("apellido: " + test.get("surname"));
+		System.out.println("edad " + test.get("age"));
 		test.put("name","tomas");
 		System.out.println("nuevo nombre: " + test.get("name"));
 		System.out.println("key inexistente: " + test.get("age"));
-		test.put("nationality","uruguay");
+	
 
 		StringBuilder sb = new StringBuilder();
-		for (String[] a : test.contents)
+		for (Object[] a : test.contents)
 		{
-    		for (String s : a) 
-    		{	sb.append(s);
+    		for (Object s : a) 
+    		{	sb.append(s.toString());
     			sb.append(" ");
     		}
     		sb.append( " - ");
 		}
-		System.out.println("full hash: " + sb);
+		System.out.println("full hash > " + sb);
 
-		Mapa test2 = new Mapa();
-		System.out.println(test2.get("name"));
+
 	}
 }
 
