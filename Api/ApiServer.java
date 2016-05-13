@@ -8,8 +8,12 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
  
 
-public class ApiServer {
 
+
+// a very simple (ugly) request Server to test the MeLi API.  
+
+
+public class ApiServer {
 
     public static String get_url(String text){
     

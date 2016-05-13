@@ -32,7 +32,7 @@ class Mapa {
 		for(int i = 0; i < contents.size(); i++) {
 			Object[] arr = contents.get(i);
 			if (arr[0] == key) {
-				return (arr[1].getClass()).cast(arr[1]);
+				return (arr[1].getClass()).cast(arr[1]); // "reflection" java-hack! jeje
 			}	
 		}
 		//return null if key does not exist
