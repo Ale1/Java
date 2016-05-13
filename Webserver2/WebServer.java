@@ -73,7 +73,6 @@ class ConnectionHandler  extends Thread {
 }
 
 
-
 class CountryHandler extends Thread {
     private Socket clientSocket;
     private String country;
@@ -112,7 +111,6 @@ class CountryHandler extends Thread {
 
     }
 }
-
 
 
 class RequestHandler extends Thread {
@@ -170,7 +168,6 @@ class RequestHandler extends Thread {
 }
 
 
-
 abstract class ServerUtils {
     public static String jsonParser(String text){
     
@@ -191,7 +188,6 @@ abstract class ServerUtils {
         }
         return result;
    }
-
 
     public static String parseInputStream(InputStream stream) {
 

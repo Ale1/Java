@@ -15,7 +15,7 @@ class WebServer{
 
     public static void main(String[] args) {
         ServerSocket serverSocket;
-        int port_num = 8070;
+        int port_num = 8080;
 
         try {
             serverSocket = new ServerSocket(port_num); // create listening Server socket
@@ -41,7 +41,6 @@ class ConnectionHandler extends Thread {
     ConnectionHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
     }
-
 
     public void run() {
         try{
