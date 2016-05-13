@@ -13,8 +13,6 @@ public class ApiClient {
  
         try (
             Socket apiSocket = new Socket(hostName, portNumber);
-            PrintWriter out =
-                new PrintWriter(apiSocket.getOutputStream(), true);
             BufferedReader in =
                 new BufferedReader(
                     new InputStreamReader(apiSocket.getInputStream()));

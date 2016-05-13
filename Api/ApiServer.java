@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.net.*;
 import java.util.Scanner;
 
 import org.json.simple.JSONObject;
@@ -78,7 +79,6 @@ public class ApiServer {
                 new ServerSocket(portNumber);
             Socket clientSocket = serverSocket.accept();     
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);                   
-            BufferedReader in = new BufferedReader( new InputStreamReader(clientSocket.getInputStream()));
         ) {
             String item_url = ApiServer.fetch("hello");
             out.println(item_url);
