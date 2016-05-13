@@ -11,6 +11,8 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
  
 
+ //description:  an improved web server that asynchronously fetches 10 items from different meli country sites using the API. 
+
 class WebServer{
 
     public static void main(String[] args) {
@@ -124,6 +126,7 @@ class RequestHandler extends Thread {
         this.country = country;                 
     }
 
+
     private void htmlWriter(String response_url) {
 
         try { 
@@ -169,6 +172,7 @@ class RequestHandler extends Thread {
 
 
 abstract class ServerUtils {
+
     public static String jsonParser(String text){
     
         JSONParser parser = new JSONParser();
@@ -188,6 +192,7 @@ abstract class ServerUtils {
         }
         return result;
    }
+
 
     public static String parseInputStream(InputStream stream) {
 
