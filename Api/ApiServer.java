@@ -10,8 +10,8 @@ import org.json.simple.parser.JSONParser;
  
 
 
-
-// a very simple (ugly) request Server to test the MeLi API.  
+// DESCRIPTION
+// a very simple (ugly) single GET request Server to test the MeLi API.  
 
 
 public class ApiServer {
@@ -19,7 +19,7 @@ public class ApiServer {
     public static String get_url(String text){
     
       JSONParser parser = new JSONParser();
-      String result = "crap";
+      String result = "";
         
       try{
         Object obj = parser.parse(text); 
@@ -56,21 +56,15 @@ public class ApiServer {
                 }
 
         } 
-        catch (MalformedURLException e) { 
-                // new URL() failed
-                System.out.println("woopsie");
+        catch (Exception e) { 
+                System.out.println("woopsie: " + e);
         } 
-        catch (IOException e) {   
-                // openConnection() failed
-                System.out.println("Woopsie doopsie");
-        }
         return return_string;
     }
 
 
 
     public static void main(String[] args) throws IOException {
-         
      
         int portNumber = 5541;
          
@@ -83,10 +77,8 @@ public class ApiServer {
             String item_url = ApiServer.fetch("hello");
             out.println(item_url);
             
-        } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port "
-                + portNumber + " or listening for a connection");
-            System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error trying to listen on port "+ portNumber);
         }
     }
 

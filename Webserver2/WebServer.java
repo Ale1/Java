@@ -10,8 +10,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
  
-
- //description:  an improved web server that asynchronously fetches 10 items from different meli country sites using the API. 
+// DESCRIPTION
+// an improved web server that asynchronously fetches 10 items from different meli country sites using the API. 
 
 class WebServer{
 
@@ -29,8 +29,7 @@ class WebServer{
                 thread.start();
             }
                 
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Could not listen on port: " + port_num + " because " + e);
         }      
     }
@@ -66,7 +65,6 @@ class ConnectionHandler  extends Thread {
             outputStream.write(("<p> LIST COMPLETE - HAVE A NICE DAY! </p></body></html>").getBytes());
             outputStream.close();
  
-
         }catch (Exception e){
             System.out.println("connection handler error");
 
@@ -109,7 +107,7 @@ class CountryHandler extends Thread {
                     outputStream.write(
                         ("<p> finished all  " + country +" requests </p></body></html>").getBytes()
                     ); 
-            }catch(Exception e) {System.out.println("woops");}         
+            }catch(Exception e) {System.out.println("woops: " + e);}         
 
     }
 }
@@ -132,7 +130,6 @@ class RequestHandler extends Thread {
         try { 
             OutputStream outputStream = clientSocket.getOutputStream();
             outputStream.write(("<p><a href=" + response_url +">item "+ country + offset + "</a></p>").getBytes());           
-            System.out.println("Done processing request (item "+ country + offset +")");
     
         }
         catch(Exception e) {
@@ -158,13 +155,8 @@ class RequestHandler extends Thread {
 
                 htmlWriter(response_url); // write result to output stream
 
-           
-
         } 
-        catch (MalformedURLException e) { 
-                System.out.println("new URL() failed");
-        } 
-        catch (IOException e) {   
+        catch (Exception e) {   
                 System.out.println("GET request failed: " + e);
         }
     }
@@ -176,7 +168,7 @@ abstract class ServerUtils {
     public static String jsonParser(String text){
     
         JSONParser parser = new JSONParser();
-        String result = " error";
+        String result = "";
         
         try{
             // parsing and fetching of permalink value in response JSON

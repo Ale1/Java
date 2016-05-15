@@ -11,8 +11,8 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
  
 
-
-// Description:  A local web server that asynchronoulsy writes links to 10 meli-argentina items obtained from meli API. 
+// DESCRIPTION
+// A local web server that asynchronoulsy writes links to 10 meli-argentina items obtained from meli API. 
 
 
 
@@ -29,11 +29,9 @@ class WebServer{
 
             while (true) {  // always on listening for TCP connection requests
                 ConnectionHandler thread = new ConnectionHandler(serverSocket.accept()); // start thread to handle client
-                System.out.println("accepted connection");
                 thread.start();
             }          
-
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.out.println("Could not listen on port: " + port_num + "because" + e);
         }      
     }
@@ -74,8 +72,6 @@ class ConnectionHandler extends Thread {
             
             outputStream.write(("</td></table><p> FINISHED MLA</p></body></html>").getBytes());
             outputStream.close();
-
-
         }
         catch(Exception e) {
             System.out.println("error with connection handler");
@@ -101,7 +97,6 @@ class RequestHandler extends Thread {
         try { 
             OutputStream outputStream = clientSocket.getOutputStream();
             outputStream.write(("<p><a href=" + response_url +">item "+ offset + "</a></p>").getBytes());           
-            System.out.println("Done processing request (item "+ offset +")");
     
         }
         catch(Exception e) {
@@ -128,14 +123,9 @@ class RequestHandler extends Thread {
                 String response_url = ServerUtils.jsonParser(responseBody);  // text to json, then fetch url
 
                 htmlWriter(response_url); // write response to outputStream
-
-
         } 
-        catch (MalformedURLException e) { 
-                System.out.println("new URL() failed");
-        } 
-        catch (IOException e) {   
-                System.out.println("openConnection() failed");
+        catch (Exception e) {   
+                System.out.println("error: " + e);
         }
     }
 
@@ -169,7 +159,7 @@ abstract class ServerUtils {
             result = obj4.get("permalink").toString();
       
         }catch(ParseException pe){
-            System.out.println("Parse error");
+            System.out.println("Parse error: " + pe);
         }
         return result;
    }
