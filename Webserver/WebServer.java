@@ -8,9 +8,7 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
 
 
-
-// USAGE:   go to "localhost:8000/<query>" in browser to make a Meli API search with query word.  
-// EXAMPLE:   "localhost8000/ipod" will search MLA for all ipod items and return first result. 
+// USAGE EXAMPLE:  go to  "localhost8000/ipod" will search MLA for all ipod items and return first result. 
 
 
 class WebServer{
@@ -25,20 +23,20 @@ class WebServer{
             System.out.println("Server started. Listening to the port: " + port_num);
 
 
-            while (true) {                                                  // always on listening for TCP connection requests
+            while (true) {                                                                     //(0) always on listening for TCP connection requests
 
-                Socket clientSocket = serverSocket.accept();                    // (1)    accept all incoming client connections
+                Socket clientSocket = serverSocket.accept();                                   // (1)    accept incoming client connection
                 OutputStream outputStream = clientSocket.getOutputStream();  
 
                 BufferedReader in =  new BufferedReader (
-                    new InputStreamReader(clientSocket.getInputStream())        // (2)    parse incoming get request from client
+                    new InputStreamReader(clientSocket.getInputStream())                       // (2)    parse incoming get request from client
                 );
-                String query = parseParams(in.readLine());                        // (3)    get first line of headers, and extract url query param (e.g "ipod").
-                URL queryURL = new URL(baseURL + query);                           // (4)    build query URL
-                String response = getRequest(queryURL);                            // (5)    execute get request to MELI API with query param
-                String item = filter(response);                                 // (6)    filter response to get 1 item
-                System.out.println(item);
+                String query = parseParams(in.readLine());                                     // (3)    get first line of headers, and extract url query param (e.g "ipod").
+                URL queryURL = new URL(baseURL + query);                                       // (4)    build query URL
+                String response = getRequest(queryURL);                                        // (5)    execute get request to MELI API with query param
+                String item = filter(response);                                                // (6)    filter response to get 1 item
                 outputStream.write(("<p><a href=" + item +">link </a></p>").getBytes());       // (7)    write response to output stream
+                
             }          
         } catch (Exception e) {
             System.out.println("Could not listen on port: " + port_num + "because" + e);
@@ -81,20 +79,20 @@ class WebServer{
     }
 
     public static String filter(String text){
-    JSONParser parser = new JSONParser();
-    String item = "";
+        JSONParser parser = new JSONParser();
+        String item = "";
         
-    try{
-        Object obj = parser.parse(text); 
-        JSONObject obj2 = (JSONObject)obj;
-        JSONArray obj3 = (JSONArray)obj2.get("results");
-        JSONObject obj4 = (JSONObject)obj3.get(0);
-        item = obj4.get("permalink").toString();
+        try{
+            Object obj = parser.parse(text); 
+            JSONObject obj2 = (JSONObject)obj;
+            JSONArray obj3 = (JSONArray)obj2.get("results");
+            JSONObject obj4 = (JSONObject)obj3.get(0);
+            item = obj4.get("permalink").toString();
       
-      }catch(Exception e){
-         System.out.println("Error4: " + e);
-      }
-      return item;
+        }catch(Exception e){
+             System.out.println("Error4: " + e);
+        }
+    return item;
    }
 
 

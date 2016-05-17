@@ -16,7 +16,9 @@ class CustomHashMap{
 		//go to first entry, if empty, write key-value there:
 		if(buckets[hash] == null){
 			buckets[hash] = (new Entry(key,value,null));
-		}else{
+		}
+		else
+		{
 		// grab entries and compare key, if match replace, otherwise jump to next entry
 			Entry current = buckets[hash];
 			Entry previous = null;
@@ -25,14 +27,14 @@ class CustomHashMap{
 				if(current.key == key){
 					current.value = value;
 					return;
-				}else{
+				}
+				else{
 					previous = current;
 					current = current.next;
 				}
 			}
 			// no matches found, then grab saved previous (the last non-null entry) and insert there:
 			previous.next = new Entry (key, value, null);
-
 		}
 	}
 
