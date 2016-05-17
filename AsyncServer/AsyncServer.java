@@ -48,14 +48,14 @@ class ConnectionHandler implements Runnable{
         try{
 
             BufferedReader in =  new BufferedReader (
-                new InputStreamReader(clientSocket.getInputStream())        			         // (1)    parse incoming get request from client
+                new InputStreamReader(clientSocket.getInputStream())        			         // (1)   parse incoming get request from client
             );
 
-            String query = parseParams(in.readLine());                        				     // (2)    get first line of headers, and extract url query param (e.g "ipod").
-          	ArrayList<URL> queryURLS = makeQueryURLS(query);								               // (3)    build 10 query URL (one for each country)
-          	for( URL queryURL: queryURLS){  												                       // (4) for each country create requesthandler thread 
+            String query = parseParams(in.readLine());                        				     // (2)   get first line of headers, and extract url query param (e.g "ipod").
+          	ArrayList<URL> queryURLS = makeQueryURLS(query);								     // (3)   build 10 query URL (one for each country)
+          	for( URL queryURL: queryURLS){  												     // (4)   for each country create requesthandler thread 
           		  Thread thread = new Thread( new RequestHandler(clientSocket, queryURL));
-          		  thread.start();																                             // (5) requestHandler does get request and writes response asynchronously     	
+          		  thread.start();																 // (5) requestHandler does get request and writes response asynchronously     	
             }                           
 
 		    }catch(Exception e){
@@ -103,9 +103,9 @@ class RequestHandler implements Runnable {
 
 	public void run() {
 
-		String item = filter(getRequest());												// (6) make get request and filter response
+		String item = filter(getRequest());								// (6) make get request and filter response
 		System.out.println(item);
-		htmlWriter(item); 																        // (7) write response to output stream
+		htmlWriter(item); 											    // (7) write response to output stream
 
 	}
 

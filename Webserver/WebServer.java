@@ -8,7 +8,7 @@ import org.json.simple.parser.ParseException;
 import org.json.simple.parser.JSONParser;
 
 
-// USAGE EXAMPLE:  go to  "localhost8000/ipod" will search MLA for all ipod items and return first result. 
+// USAGE EXAMPLE:  go to  "localhost8000/ipod" in browser to search MLA for all ipod items and return first result. 
 
 
 class WebServer{
@@ -23,7 +23,7 @@ class WebServer{
             System.out.println("Server started. Listening to the port: " + port_num);
 
 
-            while (true) {                                                                     //(0) always on listening for TCP connection requests
+            while (true) {                                                                     // (0) always on listening for TCP connection requests
 
                 Socket clientSocket = serverSocket.accept();                                   // (1)    accept incoming client connection
                 OutputStream outputStream = clientSocket.getOutputStream();  

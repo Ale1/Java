@@ -30,8 +30,8 @@ public class EchoServer {
             String query;
             while ((query = in.readLine()) != null) {           // (1) listen for client query
 
-                String queryResults =  get(query);              //(2) get request to API , which returns query results
-                String firstItem =  filter(queryResults);       //(3) filter first item 
+                String queryResults =  get(query);              // (2) get request to API , which returns query results
+                String firstItem =  filter(queryResults);       // (3) filter first item 
                 out.println(firstItem);                         // (4) print first item to output stream
             }
 

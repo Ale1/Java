@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 class CustomHashMap{
 
-	// create very simple custom Hashmap in the form of array with 4 buckets.  
+	// create very simple custom Hashmap in the form of array with 4 linkedlist buckets.  
 	Entry[] buckets = { null, null, null, null};
 	
 
